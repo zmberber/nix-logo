@@ -37,10 +37,10 @@ let
   svg = ''
     <svg xmlns="http://www.w3.org/2000/svg" width="${toString size}" height="${toString size}">
       ${polygon {
-        points = [
-          { x = size / 2; y = size * 0.1; }
-          { x = size * 0.9; y = size * 0.9; }
-          { x = size * 0.1; y = size * 0.9; }
+        points = shearPoints [
+          { i = size / 2; j = size / 8; }
+          { i = size / 2; j = size / 2; }
+          { i = size / 8; j = size / 2; }
         ];
         attrs = {
           fill = logoColor;
