@@ -1,6 +1,9 @@
 {
+  system,
   size ? 256,
-  logoColor ? "#7EBAE4",
+  gap ? 0,
+  thickness ? 1,
+  colors ? [ "#5277C3" "#7EBAE4" "#5277C3" "#7EBAE4" "#5277C3" "#7EBAE4" ],
 }:
 let
   pointsToString = (
@@ -24,29 +27,93 @@ let
     in
     ''<polygon points="${svgPoints}" ${attrStr}/>''
   );
-  sqrt3over2 = 0.8660254037844386;
+  sqrt3Over2 = 0.8660254037844386;
+  O = { i = 0; j = 0; };
+  I = { i = 1; j = 0; };
+  J = { i = 0; j = 1; };
+  K = { i = -1; j = 1; };
+  mI = { i = -1; j = 0; };
+  mJ = { i = 0; j = -1; };
+  mK = { i = 1; j = -1; };
   shear =
-    point:
-    { x = point.i + point.j * 0.5; y = point.j * sqrt3over2; }
+    latticePoint:
+    {
+      x = latticePoint.i + latticePoint.j * 0.5;
+      y = latticePoint.j * sqrt3Over2;
+    }
   ;
-  shearPoints = points: (map shear points);
-  lambda = (
-    sixths:
-    {}
+  addLatticePoints =
+    a:
+    b:
+    {
+      i = a.i + b.i;
+      j = a.j + b.j;
+    }
+  ;
+  scaleLatticePoint =
+    l:
+    a:
+    {
+      i = l * a.i;
+      j = l * a.j;
+    }
+  ;
+  sixthRotation =
+    n:
+    latticePoint:
+    if n == 0 then
+      latticePoint
+    else (
+      sixthRotation
+      (n - 1)
+      {
+        i = -latticePoint.j;
+        j = latticePoint.i + latticePoint.j;
+      }
+    )
+  ;
+  lambda =
+    let
+      torso = O;
+      kopf = scaleLatticePoint 4 K;
+      schwanz = scaleLatticePoint 4 mK;
+      fuss = scaleLatticePoint 4 mJ;
+    in
+    [
+      (addLatticePoints (addLatticePoints kopf J) (scaleLatticePoint (thickness + gap) mK))
+      (addLatticePoints (addLatticePoints kopf mJ) (scaleLatticePoint (thickness + gap) mK))
+      (addLatticePoints torso (scaleLatticePoint thickness mI))
+      (addLatticePoints fuss (scaleLatticePoint thickness K))
+      fuss
+      (addLatticePoints fuss (scaleLatticePoint thickness I))
+      (addLatticePoints torso (scaleLatticePoint thickness (addLatticePoints mJ mK)))
+      (addLatticePoints schwanz (scaleLatticePoint thickness mI))
+      (addLatticePoints schwanz (scaleLatticePoint thickness I))
+    ]
+  ;
+  svg = builtins.concatStringsSep "\n" (
+    [''<svg xmlns="http://www.w3.org/2000/svg" width="${toString size}" height="${toString size}">'']
+    ++
+    (
+      builtins.genList
+      (
+        n:
+        polygon {
+          points = map shear (map (p: (sixthRotation n (addLatticePoints (scaleLatticePoint 4 mJ) p))) lambda);
+          attrs = { fill = builtins.elemAt colors n; };
+        }
+      )
+      6
+    )
+    ++
+    [''</svg>'']
   );
-  svg = ''
-    <svg xmlns="http://www.w3.org/2000/svg" width="${toString size}" height="${toString size}">
-      ${polygon {
-        points = shearPoints [
-          { i = size / 2; j = size / 8; }
-          { i = size / 2; j = size / 2; }
-          { i = size / 8; j = size / 2; }
-        ];
-        attrs = {
-          fill = logoColor;
-        };
-      }}
-    </svg>
-  '';
 in
-builtins.toFile "nix-logo.svg" svg
+derivation {
+  name = "nix-logo";
+  inherit system;
+  builder = "/bin/sh";
+  args = [ "-c"
+    "mkdir -p $out/share && cp ${builtins.toFile "nix-logo.svg" svg} $out/share/nix-logo.svg"
+  ];
+}
