@@ -2,7 +2,6 @@
   size ? 256,
   logoColor ? "#7EBAE4",
 }:
-
 let
   pointsToString = (
     points:
@@ -10,7 +9,6 @@ let
     " "
     (map (p: "${toString p.x},${toString p.y}") points)
   );
-
   polygon = (
     { points, attrs }:
     let
@@ -26,7 +24,16 @@ let
     in
     ''<polygon points="${svgPoints}" ${attrStr}/>''
   );
-
+  sqrt3over2 = 0.8660254037844386;
+  shear =
+    point:
+    { x = point.i + point.j * 0.5; y = point.j * sqrt3over2; }
+  ;
+  shearPoints = points: (map shear points);
+  lambda = (
+    sixths:
+    {}
+  );
   svg = ''
     <svg xmlns="http://www.w3.org/2000/svg" width="${toString size}" height="${toString size}">
       ${polygon {
