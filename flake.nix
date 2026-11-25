@@ -21,9 +21,23 @@
       ;
     in
     {
-      packages = inAllSystems (system: rec {
-        nix-logo = import ./package.nix { inherit system; };
-        default = nix-logo;
-      });
+      packages =
+        inAllSystems
+        (
+          system:
+          let
+            mkLogo = args: import ./package.nix ({ inherit system; } // args);
+          in
+          rec {
+            nix-logo = mkLogo { };
+            default = nix-logo;
+            nix-logo-pride = mkLogo {
+              colors = [ "#c10100" "#5a37bb" "#0088cc" "#029b3b" "#fdb00b" "#ff6705" ];
+            };
+            nix-logo-trans = mkLogo {
+              colors = [ "#f5a9b8" "#5bcefa" "#ffffff" "#f5a9b8" "#5bcefa" "#ffffff" ];
+            };
+          }
+        );
     };
 }
