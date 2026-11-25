@@ -1,6 +1,5 @@
 {
   system,
-  size ? 1024,
   resolution ? 16,
   gap ? 0.25,
   thickness ? 1,
@@ -70,7 +69,7 @@ let
     (
       n:
       map
-      (p: (sixthRotation n (plus (plus (scale 4 mJ) (scale (hals - 4) mJ)) p)))
+      (p: (sixthRotation n (plus (scale hals mJ) p)))
       lambda
     )
     6
@@ -119,7 +118,7 @@ let
     ''<polygon points="${pointsToString points}" ${attrStr}/>''
   );
   svg = ''
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="${toString size}" height="${toString size}">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}">
     ${
       builtins.concatStringsSep
       "\n"

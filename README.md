@@ -12,22 +12,23 @@ Simply run `nix build`, and the (default) logo will be built as an svg in `./res
 
 Run `nix build .#$VARIATION` to get one of the following variations:
 
-| `$VARIATION`          | Description                        |
-|-----------------------|------------------------------------|
-| `nix-logo`            | Default standard logo              |
-| `nix-logo-pride`      | Nix logo with pride colors         |
-| `nix-logo-trans`      | Nix logo with trans colors         |
-| `nix-logo-styleguide` | Modified Nix logo from style guide |
+| `$VARIATION`          | Description                           |
+|-----------------------|---------------------------------------|
+| `nix-logo`            | Default standard logo                 |
+| `nix-logo-pride`      | Nix logo with pride colors            |
+| `nix-logo-trans`      | Nix logo with trans colors            |
+| `nix-logo-styleguide` | Modified Nix logo from style guide    |
+| `nix-logo-black`      | Nix logo in black                     |
+| `nix-logo-nogap`      | Nix logo with no gaps between lambdas |
 
 ### Options
 
 | key        | Description                                                                   | Type                               |
 |------------|-------------------------------------------------------------------------------|------------------------------------|
 | gap        | gap between the lambdas, gets cut away from the head of a lambda              | float                              |
-| thickness  | thickness of the lambda                                                       | float                              |
+| thickness  | thickness of the lambda, but "radius", not "diameter"                         | float                              |
 | colors     | colors of each lambda, starting from the upright lambda, then couterclockwise | list of strings (hex color values) |
 | hals       | length of the "neck" of the lambda                                            | float                              |
-| size       | size of the SVG                                                               | float                              |
 | resolution | multiplied with each `gap`, `thickness`, and `hals`, must produce an integer  | integer                            |
 | pad        | pad between the logo and the edges of the SVG bounding box                    | float                              |
 
@@ -35,7 +36,6 @@ You can override the options as follows (all `--arg` values here are the default
 
 ```sh
 nix build -f package.nix --argstr system x86_64-linux \
-  --arg size 1024 \
   --arg resolution 16 \
   --arg gap 0.25 \
   --arg thickness 1 \
