@@ -1,6 +1,6 @@
 {
   system,
-  size ? 256,
+  size ? 1024,
   gap ? 0,
   thickness ? 1,
   colors ? [ "#5277C3" "#7EBAE4" "#5277C3" "#7EBAE4" "#5277C3" "#7EBAE4" ],
@@ -39,7 +39,7 @@ let
     latticePoint:
     {
       x = latticePoint.i + latticePoint.j * 0.5;
-      y = latticePoint.j * sqrt3Over2;
+      y = -(latticePoint.j * sqrt3Over2);
     }
   ;
   addLatticePoints =
@@ -91,15 +91,40 @@ let
       (addLatticePoints schwanz (scaleLatticePoint thickness I))
     ]
   ;
+  allLambdas = builtins.genList
+    (
+      n:
+      map
+      (p: (sixthRotation n (addLatticePoints (scaleLatticePoint 4 mJ) p)))
+      lambda
+    )
+    6
+  ;
+  allLambdasSheared = map (map shear) allLambdas;
+  viewBox =
+    let
+      allPoints = builtins.concatLists allLambdasSheared;
+      xs = map (p: p.x) allPoints;
+      ys = map (p: p.y) allPoints;
+      min = a: b: if a < b then a else b;
+      max = a: b: if a < b then b else a;
+      minX = builtins.foldl' min (builtins.head xs) xs;
+      maxX = builtins.foldl' max (builtins.head xs) xs;
+      minY = builtins.foldl' min (builtins.head ys) ys;
+      maxY = builtins.foldl' max (builtins.head ys) ys;
+      pad = 1;
+    in
+    "${toString (minX - pad)} ${toString (minY - pad)} ${toString (maxX - minX + 2 * pad)} ${toString (maxY - minY + 2 * pad)}"
+  ;
   svg = builtins.concatStringsSep "\n" (
-    [''<svg xmlns="http://www.w3.org/2000/svg" width="${toString size}" height="${toString size}">'']
+    [''<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="${toString size}" height="${toString size}">'']
     ++
     (
       builtins.genList
       (
         n:
         polygon {
-          points = map shear (map (p: (sixthRotation n (addLatticePoints (scaleLatticePoint 4 mJ) p))) lambda);
+          points = builtins.elemAt allLambdasSheared n;
           attrs = { fill = builtins.elemAt colors n; };
         }
       )
@@ -110,10 +135,9 @@ let
   );
 in
 derivation {
-  name = "nix-logo";
+  name = "nix-logo.svg";
   inherit system;
   builder = "/bin/sh";
-  args = [ "-c"
-    "mkdir -p $out/share && cp ${builtins.toFile "nix-logo.svg" svg} $out/share/nix-logo.svg"
-  ];
+  args = [ "-c" ''printf '%s' "$svg" > "$out"'' ];
+  inherit svg;
 }
