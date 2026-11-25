@@ -12,11 +12,12 @@ Simply run `nix build`, and the (default) logo will be built as an svg in `./res
 
 Run `nix build .#$VARIATION` to get one of the following variations:
 
-| `$VARIATION`     | Description                    |
-|------------------|--------------------------------|
-| `nix-logo`       | The default standard logo      |
-| `nix-logo-pride` | The Nix logo with pride colors |
-| `nix-logo-trans` | The Nix logo with trans colors |
+| `$VARIATION`          | Description                        |
+|-----------------------|------------------------------------|
+| `nix-logo`            | Default standard logo              |
+| `nix-logo-pride`      | Nix logo with pride colors         |
+| `nix-logo-trans`      | Nix logo with trans colors         |
+| `nix-logo-styleguide` | Modified Nix logo from style guide |
 
 ### Options
 
@@ -30,7 +31,7 @@ Run `nix build .#$VARIATION` to get one of the following variations:
 | resolution | multiplied with each `gap`, `thickness`, and `hals`, must produce an integer  | integer                            |
 | pad        | pad between the logo and the edges of the SVG bounding box                    | float                              |
 
-You can override the options as follows (all values here are the defaults):
+You can override the options as follows (all `--arg` values here are the defaults):
 
 ```sh
 nix build -f package.nix --argstr system x86_64-linux \

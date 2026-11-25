@@ -37,6 +37,10 @@
             nix-logo-trans = mkLogo {
               colors = [ "#f5a9b8" "#5bcefa" "#ffffff" "#f5a9b8" "#5bcefa" "#ffffff" ];
             };
+	    nix-logo-styleguide = mkLogo {
+	      hals = 5;
+	    };
+	    # nix-logo-old = mkLogo { }; # todo, as close as possible to old
           }
         );
     };

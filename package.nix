@@ -70,7 +70,7 @@ let
     (
       n:
       map
-      (p: (sixthRotation n (plus (scale 4 mJ) p)))
+      (p: (sixthRotation n (plus (plus (scale 4 mJ) (scale (hals - 4) mJ)) p)))
       lambda
     )
     6
